@@ -1,4 +1,4 @@
 {
-	"DISCOURSE_API_USERNAME": "eviltrout",
-	"DISCOURSE_BASE_URL": "https://localhost:8080"
+	"SITE_API_USERNAME": "myusername",
+	"SITE_BASE_URL": "https://localhost:8080"
 }

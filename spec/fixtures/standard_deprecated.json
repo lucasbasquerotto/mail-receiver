@@ -1,5 +1,5 @@
 {
-	"DISCOURSE_API_KEY": "EXAMPLE_KEY",
-	"DISCOURSE_API_USERNAME": "eviltrout",
-	"DISCOURSE_MAIL_ENDPOINT": "https://localhost:8080/mail-me"
+	"SITE_API_KEY": "EXAMPLE_KEY",
+	"SITE_API_USERNAME": "myusername",
+	"SITE_MAIL_ENDPOINT": "https://localhost:8080/mail-me"
 }

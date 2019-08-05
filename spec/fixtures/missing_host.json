@@ -1,4 +1,4 @@
 {
-	"DISCOURSE_API_KEY": "EXAMPLE_KEY",
-	"DISCOURSE_API_USERNAME": "eviltrout"
+	"SITE_API_KEY": "EXAMPLE_KEY",
+	"SITE_API_USERNAME": "myusername"
 }

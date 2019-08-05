@@ -3,30 +3,39 @@ and spawning an instance of another container to do "something" with the
 e-mail.  That's it.  All very simple and straightforward.  You would
 think...
 
+Based on the discourse repository:
+
+https://github.com/discourse/mail-receiver
+
 
 # Installation and Configuration
 
 Minimal configuration requires you to specify the domain you're receiving
-mail for, and how to connect to your Discourse instance (URL, API key, etc).
+mail for, and how to connect to your Site instance (URL, API key, etc).
 This involves setting the following environment variables:
 
 * `MAIL_DOMAIN` -- the domain name(s) to accept mail for and relay to
-  Discourse.  Any number of space-separated domain names can be listed here.
+  the Site. Any number of space-separated domain names can be listed here.
 
-* `DISCOURSE_BASE_URL` -- the base URL for this Discourse instance.
-  This will be whatever your Discourse site URL is. For example,
-  `https://discourse.example.com`. If you're running a subfolder setup,
+* `SITE_BASE_URL` -- the base URL for this Site instance.
+  This will be whatever your site URL is. For example,
+  `https://subdomain.example.com`. If you're running a subfolder setup,
   be sure to account for that (ie `https://example.com/forum`).
 
-* `DISCOURSE_API_KEY` -- the API key which will be used to authenticate to
-  Discourse in order to submit mail.  The value to use is shown in the "API"
-  tab of the site admin dashboard.
+* `SITE_API_KEY` -- the API key which will be used to authenticate to
+  the site API in order to submit mail.
 
-* `DISCOURSE_API_USERNAME` -- (optional) the user whose identity and
-  permissions will be used to make requests to the Discourse API.  This
-  defaults to `system` and should be OK for 99% of cases.  The remaining 1%
-  of times is where someone has (ill-advisedly) renamed the `system` user in
-  Discourse.
+* `SITE_API_USERNAME` -- (optional) the user whose identity and
+  permissions will be used to make requests to the site API.  This
+  defaults to `system`.
+
+* `SITE_API_HANDLE_MAIL_URL` -- the path relative to the site endpoint
+  that will handle the http request that will send the email. E.g: 
+  `admin/email/handle_mail`
+
+* `SITE_API_SHOULD_REJECT_MAIL_URL` -- the path relative to the site endpoint
+  that will return a JSON specifying if it should reject the email. E.g: 
+  `admin/email/smtp_should_reject.json`  
 
 For a straightforward setup, the above environment variables *should* be
 enough to get you up and running.  If you have a desire for a more
@@ -65,16 +74,16 @@ sent to that socket for further processing.
 
 # Theory of Operation
 
-Every e-mail that is received is delivered to a custom `discourse` service.
+Every e-mail that is received is delivered to a custom `site` service.
 That service, which is a small Ruby program, makes a POST request to the
-admin interface on the specified URL (`DISCOURSE_BASE_URL`), with the key
-and username specified.  Discourse itself stands ready to receive that
+admin interface on the specified URL (`SITE_BASE_URL`), with the key
+and username specified. The site itself stands ready to receive that
 e-mail and process it into the discussion, in exactly the same way as an
 e-mail received via POP3 polling.
 
-Before delivery to the `discourse` service, a Postfix policy handler runs,
-asks Discourse if either the sender and/or recipient are invalid, and if so,
-rejects the incoming mail during the SMTP transaction, to prevent Discourse
+Before delivery to the `site` service, a Postfix policy handler runs,
+asks the site if either the sender and/or recipient are invalid, and if so,
+rejects the incoming mail during the SMTP transaction, to prevent the site
 later sending out reply emails due to incoming spam ("backscatter").
 Legitimate users will be notified of the failure by their MTA, and obvious
 spam just gets dropped without reply. This step is just about being a good

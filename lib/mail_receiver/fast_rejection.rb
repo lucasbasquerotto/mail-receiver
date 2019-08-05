@@ -13,7 +13,7 @@ class FastRejection < MailReceiverBase
   def initialize(env_file)
     super(env_file)
 
-    @disabled = @env['DISCOURSE_FAST_REJECTION_DISABLED'] || !@env['DISCOURSE_BASE_URL']
+    @disabled = @env['SITE_FAST_REJECTION_DISABLED'] || !@env['SITE_BASE_URL']
 
     @blacklisted_sender_domains = @env.fetch('BLACKLISTED_SENDER_DOMAINS', "").split(" ").map(&:downcase).to_set
   end
@@ -64,7 +64,8 @@ class FastRejection < MailReceiverBase
     fromarg = CGI::escape(from)
     toarg = CGI::escape(to)
 
-    api_qs = "api_key=#{key}&api_username=#{username}&from=#{fromarg}&to=#{toarg}"
+    # api_qs = "api_key=#{key}&api_username=#{username}&from=#{fromarg}&to=#{toarg}"
+    api_qs = "from=#{fromarg}&to=#{toarg}"
     if uri.query && !uri.query.empty?
       uri.query += "&#{api_qs}"
     else
@@ -72,10 +73,24 @@ class FastRejection < MailReceiverBase
     end
 
     begin
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = uri.scheme == "https"
-      get = Net::HTTP::Get.new(uri.request_uri)
-      response = http.request(get)
+      # get = Net::HTTP::Get.new(uri.request_uri)
+      # response = http.request(get)
+
+      # http = Net::HTTP.new(uri.host, uri.port)
+      # http.use_ssl = uri.scheme == "https"
+      # headers = {
+      #   'api_key'=> "#{key}",
+      #   'api_username'=> "#{username}",
+      # }
+      # response = http.get(uri.path, headers)
+
+      req = Net::HTTP::Get.new(uri.request_uri)
+      req['api_key'] = "#{key}"
+      req['api_username'] = "#{username}"
+      res = Net::HTTP.start(uri.hostname, uri.port) {|http|
+        http.use_ssl = uri.scheme == "https"
+        http.request(req)
+      }
     rescue StandardError => ex
       logger.err "Failed to GET smtp_should_reject answer from %s: %s (%s)", endpoint, ex.message, ex.class
       logger.err ex.backtrace.map { |l| "  #{l}" }.join("\n")
@@ -98,7 +113,7 @@ class FastRejection < MailReceiverBase
   end
 
   def endpoint
-    "#{@env['DISCOURSE_BASE_URL']}/admin/email/smtp_should_reject.json"
+    "#{@env['SITE_BASE_URL']}/#{@env['SITE_API_SHOULD_REJECT_MAIL_URL']}"
   end
 
   private

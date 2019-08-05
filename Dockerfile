@@ -18,11 +18,11 @@ RUN >/etc/postfix/main.cf \
 	&& postconf -e mynetworks='127.0.0.0/8 [::1]/128 [fe80::]/64' \
 	&& postconf -e transport_maps=hash:/etc/postfix/transport \
 	&& postconf -e 'smtpd_recipient_restrictions = check_policy_service unix:private/policy' \
-	&& postconf -M -e 'discourse/unix=discourse unix - n n - - pipe user=nobody:nogroup argv=/usr/local/bin/receive-mail ${recipient}' \
-	&& postconf -M -e 'policy/unix=policy unix - n n - - spawn user=nobody argv=/usr/local/bin/discourse-smtp-fast-rejection' \
+	&& postconf -M -e 'site/unix=site unix - n n - - pipe user=nobody:nogroup argv=/usr/local/bin/receive-mail ${recipient}' \
+	&& postconf -M -e 'policy/unix=policy unix - n n - - spawn user=nobody argv=/usr/local/bin/site-smtp-fast-rejection' \
 	&& rm -rf /var/spool/postfix/*
 
-COPY receive-mail discourse-smtp-fast-rejection /usr/local/bin/
+COPY receive-mail site-smtp-fast-rejection /usr/local/bin/
 COPY lib/ /usr/local/lib/ruby/site_ruby/
 COPY boot /sbin/
 

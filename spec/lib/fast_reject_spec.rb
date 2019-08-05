@@ -42,7 +42,7 @@ describe FastRejection do
       response = receiver.process_single_request(
         'request' => 'smtpd_access_policy',
         'protocol_state' => 'RCPT',
-        'recipient' => 'discourse@example.com'
+        'recipient' => 'myusername@example.com'
       )
       expect(response).to start_with('defer_if_permit')
     end
@@ -57,7 +57,7 @@ describe FastRejection do
         'request' => 'smtpd_access_policy',
         'protocol_state' => 'RCPT',
         'sender' => '',
-        'recipient' => 'discourse@example.com'
+        'recipient' => 'myusername@example.com'
       )
       expect(response).to eq('dunno')
     end
@@ -66,7 +66,7 @@ describe FastRejection do
       response = receiver.process_single_request(
         'request' => 'smtpd_access_policy',
         'protocol_state' => 'RCPT',
-        'sender' => 'eviltrout@example.com'
+        'sender' => 'myusername@example.com'
       )
       expect(response).to start_with('defer_if_permit')
     end
@@ -76,7 +76,7 @@ describe FastRejection do
         'request' => 'smtpd_access_policy',
         'protocol_state' => 'RCPT',
         'sender' => 'miscreant',
-        'recipient' => 'discourse@example.com'
+        'recipient' => 'myusername@example.com'
       )
       expect(response).to start_with('defer_if_permit')
     end
@@ -86,7 +86,7 @@ describe FastRejection do
         'request' => 'smtpd_access_policy',
         'protocol_state' => 'RCPT',
         'sender' => 'miscreant@bad.com',
-        'recipient' => 'discourse@example.com'
+        'recipient' => 'myusername@example.com'
       )
       expect(response).to start_with('reject')
     end
@@ -96,7 +96,7 @@ describe FastRejection do
         'request' => 'smtpd_access_policy',
         'protocol_state' => 'RCPT',
         'sender' => 'miscreant@SaD.NeT',
-        'recipient' => 'discourse@example.com'
+        'recipient' => 'myusername@example.com'
       )
       expect(response).to start_with('reject')
     end
@@ -110,8 +110,8 @@ describe FastRejection do
       response = receiver.process_single_request(
         'request' => 'smtpd_access_policy',
         'protocol_state' => 'RCPT',
-        'sender' => 'eviltrout@example.com',
-        'recipient' => 'discourse@example.com'
+        'sender' => 'myusername@example.com',
+        'recipient' => 'myusername@example.com'
       )
       expect(response).to eq("dunno")
     end
@@ -123,8 +123,8 @@ describe FastRejection do
       response = receiver.process_single_request(
         'request' => 'smtpd_access_policy',
         'protocol_state' => 'RCPT',
-        'sender' => 'eviltrout@example.com',
-        'recipient' => 'discourse@example.com'
+        'sender' => 'myusername@example.com',
+        'recipient' => 'myusername@example.com'
       )
       expect(response).to start_with('defer_if_permit')
     end
@@ -140,8 +140,8 @@ describe FastRejection do
       response = receiver.process_single_request(
         'request' => 'smtpd_access_policy',
         'protocol_state' => 'RCPT',
-        'sender' => 'eviltrout@example.com',
-        'recipient' => 'discourse@example.com'
+        'sender' => 'myusername@example.com',
+        'recipient' => 'myusername@example.com'
       )
       expect(response).to eq("reject because I said so")
     end

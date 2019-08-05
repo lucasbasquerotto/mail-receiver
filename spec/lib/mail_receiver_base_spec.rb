@@ -1,4 +1,4 @@
-require_relative '../../lib/mail_receiver/discourse_mail_receiver'
+require_relative '../../lib/mail_receiver/site_mail_receiver'
 
 RSpec.describe MailReceiverBase do
 
@@ -11,15 +11,15 @@ RSpec.describe MailReceiverBase do
   it "parses the env file" do
     receiver = described_class.new(file_for(:standard))
     expect(receiver.key).to eq('EXAMPLE_KEY')
-    expect(receiver.username).to eq('eviltrout')
-    expect(receiver.env['DISCOURSE_BASE_URL']).to eq('https://localhost:8080')
+    expect(receiver.username).to eq('myusername')
+    expect(receiver.env['SITE_BASE_URL']).to eq('https://localhost:8080')
   end
 
   it "works with the deprecated format" do
     receiver = described_class.new(file_for(:standard_deprecated))
     expect(receiver.key).to eq('EXAMPLE_KEY')
-    expect(receiver.username).to eq('eviltrout')
-    expect(receiver.env['DISCOURSE_MAIL_ENDPOINT']).to eq('https://localhost:8080/mail-me')
+    expect(receiver.username).to eq('myusername')
+    expect(receiver.env['SITE_MAIL_ENDPOINT']).to eq('https://localhost:8080/mail-me')
   end
 
   it "raises an error if the env file doesn't have the api key" do

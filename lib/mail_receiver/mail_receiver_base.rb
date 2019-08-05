@@ -10,12 +10,20 @@ class MailReceiverBase
 
     @env = JSON.parse(File.read(env_file))
 
-    %w{DISCOURSE_API_KEY DISCOURSE_API_USERNAME}.each do |kw|
+    %w{SITE_API_KEY SITE_API_USERNAME}.each do |kw|
       fatal "env var %s is required", kw unless @env[kw]
     end
 
-    if @env['DISCOURSE_MAIL_ENDPOINT'].nil? && @env['DISCOURSE_BASE_URL'].nil?
-      fatal "DISCOURSE_MAIL_ENDPOINT and DISCOURSE_BASE_URL env var missing"
+    if @env['SITE_MAIL_ENDPOINT'].nil? && @env['SITE_BASE_URL'].nil?
+      fatal "SITE_MAIL_ENDPOINT and SITE_BASE_URL env var missing"
+    end
+
+    if @env['SITE_API_HANDLE_MAIL_URL'].nil?
+      fatal "SITE_API_HANDLE_MAIL_URL env var missing"
+    end
+
+    if @env['SITE_API_SHOULD_REJECT_MAIL_URL'].nil?
+      fatal "SITE_API_SHOULD_REJECT_MAIL_URL env var missing"
     end
   end
 
@@ -28,11 +36,11 @@ class MailReceiverBase
   end
 
   def key
-    @env['DISCOURSE_API_KEY']
+    @env['SITE_API_KEY']
   end
 
   def username
-    @env['DISCOURSE_API_USERNAME']
+    @env['SITE_API_USERNAME']
   end
 
   def fatal(*args)
