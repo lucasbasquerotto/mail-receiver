@@ -29,33 +29,14 @@ class SiteMailReceiver < MailReceiverBase
   end
 
   def process
-    uri = URI.parse(endpoint)
-    # api_qs = "api_key=#{key}&api_username=#{username}"
-    # if uri.query && !uri.query.empty?
-    #   uri.query += "&#{api_qs}"
-    # else
-    #   uri.query = api_qs
-    # end
-
     begin
-      # http = Net::HTTP.new(uri.host, uri.port)
-      # http.use_ssl = uri.scheme == "https"
-      # # post = Net::HTTP::Post.new(uri.request_uri)
-      # # post.set_form_data(email: @mail)
-      # params = {'email' => @mail}
-      # headers = {
-      #   'api_key'=> "#{key}",
-      #   'api_username'=> "#{username}",
-      # }
-
-      # # response = http.request(post)
-      # response = http.post(uri.path, params.to_json, headers)
+      uri = URI.parse(endpoint)
 
       req = Net::HTTP::Post.new(uri.request_uri)
       req['api_key'] = "#{key}"
       req['api_username'] = "#{username}"
       req.set_form_data(email: @mail)
-      res = Net::HTTP.start(uri.hostname, uri.port) {|http|
+      response = Net::HTTP.start(uri.hostname, uri.port) {|http|
         http.use_ssl = uri.scheme == "https"
         http.request(req)
       }
@@ -64,8 +45,6 @@ class SiteMailReceiver < MailReceiverBase
       logger.err ex.backtrace.map { |l| "  #{l}" }.join("\n")
 
       return :failure
-    ensure
-      http.finish if http && http.started?
     end
 
     return :success if Net::HTTPSuccess === response

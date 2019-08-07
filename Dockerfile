@@ -4,8 +4,8 @@ RUN apk update \
 	&& apk add postfix socat bash \
 	&& rm -f /var/cache/apk/*
 
-EXPOSE 25
-VOLUME /var/spool/postfix
+# EXPOSE 25
+# VOLUME /var/spool/postfix
 
 RUN >/etc/postfix/main.cf \
 	&& postconf -e smtputf8_enable=no \
@@ -22,11 +22,12 @@ RUN >/etc/postfix/main.cf \
 	&& postconf -M -e 'policy/unix=policy unix - n n - - spawn user=nobody argv=/usr/local/bin/site-smtp-fast-rejection' \
 	&& rm -rf /var/spool/postfix/*
 
+# ADD https://github.com/mpalmer/socketee/releases/download/v0.0.2/socketee /usr/local/bin/
+COPY socketee /usr/local/bin/
+RUN chmod 0755 /usr/local/bin/socketee
+
 COPY receive-mail site-smtp-fast-rejection /usr/local/bin/
 COPY lib/ /usr/local/lib/ruby/site_ruby/
 COPY boot /sbin/
-
-ADD https://github.com/mpalmer/socketee/releases/download/v0.0.2/socketee /usr/local/bin/
-RUN chmod 0755 /usr/local/bin/socketee
 
 CMD ["/sbin/boot"]

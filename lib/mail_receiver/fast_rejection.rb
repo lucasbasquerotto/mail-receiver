@@ -60,34 +60,22 @@ class FastRejection < MailReceiverBase
   end
 
   def maybe_reject_email(from, to)
-    uri = URI.parse(endpoint)
-    fromarg = CGI::escape(from)
-    toarg = CGI::escape(to)
-
-    # api_qs = "api_key=#{key}&api_username=#{username}&from=#{fromarg}&to=#{toarg}"
-    api_qs = "from=#{fromarg}&to=#{toarg}"
-    if uri.query && !uri.query.empty?
-      uri.query += "&#{api_qs}"
-    else
-      uri.query = api_qs
-    end
-
     begin
-      # get = Net::HTTP::Get.new(uri.request_uri)
-      # response = http.request(get)
+      uri = URI.parse(endpoint)
+      fromarg = CGI::escape(from)
+      toarg = CGI::escape(to)
 
-      # http = Net::HTTP.new(uri.host, uri.port)
-      # http.use_ssl = uri.scheme == "https"
-      # headers = {
-      #   'api_key'=> "#{key}",
-      #   'api_username'=> "#{username}",
-      # }
-      # response = http.get(uri.path, headers)
+      api_qs = "from=#{fromarg}&to=#{toarg}"
+      if uri.query && !uri.query.empty?
+        uri.query += "&#{api_qs}"
+      else
+        uri.query = api_qs
+      end
 
       req = Net::HTTP::Get.new(uri.request_uri)
       req['api_key'] = "#{key}"
       req['api_username'] = "#{username}"
-      res = Net::HTTP.start(uri.hostname, uri.port) {|http|
+      response = Net::HTTP.start(uri.hostname, uri.port) {|http|
         http.use_ssl = uri.scheme == "https"
         http.request(req)
       }
@@ -95,8 +83,6 @@ class FastRejection < MailReceiverBase
       logger.err "Failed to GET smtp_should_reject answer from %s: %s (%s)", endpoint, ex.message, ex.class
       logger.err ex.backtrace.map { |l| "  #{l}" }.join("\n")
       return "defer_if_permit Internal error, API request preparation failed"
-    ensure
-      http.finish if http && http.started?
     end
 
     if Net::HTTPSuccess === response

@@ -56,7 +56,20 @@ chown root:root /var/spool/postfix
 
 /usr/sbin/postfix check >&2
 
-echo "Starting Postfix" >&2
+if [ ! -z "$DEV" ] && [ "$DEV" = "1" ]; then
+	echo "Starting Postfix (dev)" >&2
 
-# Finally, let postfix-master do its thing
-exec /usr/lib/postfix/master -c /etc/postfix -d
+	while true; do 
+		echo -e "request=smtpd_access_policy\nprotocol_state=RCPT\nsender=sender@from.com\nrecipient=recipient@to.com\n" \
+			| /usr/local/bin/site-smtp-fast-rejection ||:
+		sleep 5
+
+		echo "email at $(date '+%F %X')" | /usr/local/bin/receive-mail 'test-recipient' ||:
+		sleep 55
+	done
+else
+	echo "Starting Postfix" >&2
+
+	# Finally, let postfix-master do its thing
+	exec /usr/lib/postfix/master -c /etc/postfix -d
+fi
